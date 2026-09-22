@@ -10,5 +10,10 @@ class Settings(BaseSettings):
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 60
     cors_origins: str = "http://localhost:5173,http://localhost:3000"
+    weather_api_key: str = ""
+    weather_base_url: str = "https://api.openweathermap.org/data/2.5/weather"
+    agribot_api_key: str = ""
+    agribot_base_url: str = ""
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+
 settings = Settings()
