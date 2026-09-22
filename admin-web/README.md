@@ -1,13 +1,10 @@
 # AgriSmart Admin Web
 
-React + TypeScript administration dashboard.
+React + TypeScript + Vite administration dashboard.
 
-Planned areas:
-- Dashboard
-- Users
-- Farms
-- Crops
-- AI predictions
-- Disease records
-- Weather integrations
-- System configuration
+## Run
+
+npm install
+npm run dev
+
+The dashboard will be connected to the FastAPI backend in the next integration stage.
