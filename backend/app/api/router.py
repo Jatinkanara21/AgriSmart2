@@ -1,7 +1,6 @@
 from fastapi import APIRouter
+from app.api.routes import farms, system
 
 api_router = APIRouter()
-
-@api_router.get("/status", tags=["system"])
-def api_status():
-    return {"status": "ok", "api": "v1"}
+api_router.include_router(system.router)
+api_router.include_router(farms.router)
