@@ -1,5 +1,6 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
+from app.services.ml_service import load_crop_model
 
 router = APIRouter(prefix="/crop-recommendation", tags=["AI - Crop Recommendation"])
 
@@ -14,9 +15,13 @@ class CropRecommendationRequest(BaseModel):
 
 @router.post("")
 def recommend_crop(payload: CropRecommendationRequest):
-    # Placeholder until the trained model is loaded.
-    return {
-        "status": "model_pending",
-        "message": "Crop recommendation model will be connected after dataset training.",
-        "input": payload.model_dump(),
-    }
+    model = load_crop_model()
+    if model is None:
+        raise HTTPException(status_code=503, detail="Crop recommendation model is not trained yet.")
+    values = [[payload.nitrogen, payload.phosphorus, payload.potassium,
+               payload.temperature, payload.humidity, payload.ph, payload.rainfall]]
+    prediction = model.predict(values)[0]
+    confidence = None
+    if hasattr(model, "predict_proba"):
+        confidence = float(max(model.predict_proba(values)[0]))
+    return {"crop": str(prediction), "confidence": confidence}
