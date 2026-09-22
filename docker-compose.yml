@@ -1,0 +1,30 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: agrismart
+      POSTGRES_USER: agrismart
+      POSTGRES_PASSWORD: agrismart
+    ports:
+      - "5432:5432"
+    volumes:
+      - agrismart_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL","pg_isready -U agrismart -d agrismart"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+  backend:
+    build:
+      context: ./backend
+    environment:
+      DATABASE_URL: postgresql+psycopg://agrismart:agrismart@db:5432/agrismart
+      JWT_SECRET: change-this-in-development
+      CORS_ORIGINS: http://localhost:5173,http://localhost:3000
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+volumes:
+  agrismart_pgdata:
