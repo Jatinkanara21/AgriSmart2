@@ -1,7 +1,8 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from app.api.deps import get_current_user
 from app.models import User
+from app.services.weather_service import get_current_weather
 
 router=APIRouter(prefix="/weather",tags=["Weather"])
 
@@ -10,10 +11,8 @@ class WeatherRequest(BaseModel):
     longitude: float
 
 @router.post("")
-def weather(payload:WeatherRequest,current_user:User=Depends(get_current_user)):
-    return {
-        "status":"provider_pending",
-        "latitude":payload.latitude,
-        "longitude":payload.longitude,
-        "message":"Connect a weather provider in the service layer before using live weather data."
-    }
+async def weather(payload:WeatherRequest,current_user:User=Depends(get_current_user)):
+    try:
+        return await get_current_weather(payload.latitude,payload.longitude)
+    except Exception as exc:
+        raise HTTPException(status_code=502,detail="Weather provider request failed") from exc
