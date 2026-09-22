@@ -1,13 +1,18 @@
 # AgriSmart Machine Learning
 
-ML workspace for crop recommendation, plant disease detection, and yield prediction.
+## Modules
 
-## Planned structure
+- Crop Recommendation
+- Plant Disease Detection
+- Yield Prediction
 
-- datasets/
-- notebooks/
-- train/
-- inference/
-- models/
+## Environment
 
-Keep datasets and trained model binaries out of Git unless intentionally versioned.
+```bash
+cd ml
+python -m venv .venv
+.\.venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+Training datasets should remain outside Git unless licensing and size permit versioning.
