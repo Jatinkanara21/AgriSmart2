@@ -1,7 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
+from sqlalchemy import select
+from sqlalchemy.orm import Session
+
 from app.api.deps import get_current_user
-from app.models import User
+from app.db.session import get_db
+from app.models import Farm, User, YieldPrediction
 from app.services.ml_service import load_yield_model
 
 router = APIRouter(prefix="/yield-prediction", tags=["AI - Yield Prediction"])
@@ -11,11 +15,22 @@ class YieldRequest(BaseModel):
     rainfall: float = Field(ge=0)
     temperature: float
     soil_ph: float = Field(ge=0, le=14)
+    farm_id: str | None = None
+    crop_name: str = "Unknown"
 
 @router.post("")
-def predict(payload: YieldRequest, current_user: User = Depends(get_current_user)):
+def predict(payload: YieldRequest, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     model = load_yield_model()
     if model is None:
         raise HTTPException(status_code=503, detail="Yield prediction model is not trained yet")
+    farm = None
+    if payload.farm_id:
+        farm = db.scalar(select(Farm).where(Farm.id == payload.farm_id, Farm.owner_id == current_user.id))
+        if not farm:
+            raise HTTPException(status_code=404, detail="Farm not found")
     value = float(model.predict([[payload.area_acres, payload.rainfall, payload.temperature, payload.soil_ph]])[0])
-    return {"predicted_yield": value, "unit": "dataset_target_unit"}
+    unit = "dataset_target_unit"
+    if farm:
+        db.add(YieldPrediction(farm_id=farm.id, crop_name=payload.crop_name, predicted_yield=value, unit=unit))
+        db.commit()
+    return {"predicted_yield": value, "unit": unit, "farm_id": farm.id if farm else None}
