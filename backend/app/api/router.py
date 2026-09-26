@@ -1,13 +1,4 @@
 from fastapi import APIRouter
-from app.api.routes import system, auth, farms, crop_recommendation, disease, yield_prediction, agribot, weather, decision_engine
-
+from app.api.routes import system, auth, farms, crop_recommendation, disease, yield_prediction, agribot, weather, decision_engine, admin
 api_router=APIRouter()
-api_router.include_router(system.router)
-api_router.include_router(auth.router)
-api_router.include_router(farms.router)
-api_router.include_router(crop_recommendation.router)
-api_router.include_router(disease.router)
-api_router.include_router(yield_prediction.router)
-api_router.include_router(agribot.router)
-api_router.include_router(weather.router)
-api_router.include_router(decision_engine.router)
+for router in [system.router,auth.router,farms.router,crop_recommendation.router,disease.router,yield_prediction.router,agribot.router,weather.router,decision_engine.router,admin.router]: api_router.include_router(router)
