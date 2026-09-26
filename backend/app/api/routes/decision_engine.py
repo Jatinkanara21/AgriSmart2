@@ -19,5 +19,7 @@ def analyze(payload:DecisionRequest,current_user:User=Depends(get_current_user))
     if payload.rainfall > 80: recommendations.append("Monitor drainage because rainfall is high.")
     if payload.soil_ph < 5.5: recommendations.append("Consider a soil-management plan for acidic soil.")
     if payload.soil_ph > 7.5: recommendations.append("Consider a soil-management plan for alkaline soil.")
+    if payload.temperature > 38: recommendations.append("Monitor heat stress because temperature is high.")
+    if payload.humidity > 90: recommendations.append("Monitor fungal-risk conditions because humidity is high.")
     if not recommendations: recommendations.append("No basic risk rule was triggered by the supplied values.")
-    return {"recommendations":recommendations,"rules_version":"1.0"}
+    return {"recommendations":recommendations,"rules_version":"1.1"}
