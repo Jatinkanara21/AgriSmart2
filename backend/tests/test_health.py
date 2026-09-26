@@ -23,6 +23,7 @@ def test_crop_model_pending():
     db = next(get_db())
     email = "ci-crop@example.com"
     user = db.query(User).filter(User.email == email).first()
+
     if not user:
         user = User(
             full_name="CI Crop User",
